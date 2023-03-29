@@ -1,5 +1,11 @@
 #pragma once
 
+LPDIRECT3D9             g_pD3D = NULL;
+LPDIRECT3DDEVICE9       g_pd3dDevice = NULL;
+D3DPRESENT_PARAMETERS   g_d3dpp;
+HWND                    main_hwnd = NULL;
+WNDCLASSEX              wc;
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 bool CreateD3DDevice() {
@@ -18,8 +24,6 @@ bool CreateD3DDevice() {
 
     return true;
 }
-
-
 void CleanupD3DDevice()
 {
     if (g_pd3dDevice) { g_pd3dDevice->Release(); g_pd3dDevice = NULL; }
