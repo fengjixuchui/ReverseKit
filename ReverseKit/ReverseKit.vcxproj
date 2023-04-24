@@ -33,7 +33,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -66,6 +66,7 @@
     <ClInclude Include="Hooks\InternetOpenUrlW.h" />
     <ClInclude Include="Hooks\IsDebuggerPresent.h" />
     <ClInclude Include="Hooks\NtCreateThreadEx.h" />
+    <ClInclude Include="Hooks\RegEnumKeyExW.h" />
     <ClInclude Include="Hooks\RtlAdjustPrivilege.h" />
     <ClInclude Include="Hooks\SetHooks.h" />
     <ClInclude Include="Hooks\URLDownloadToFileA.h" />
