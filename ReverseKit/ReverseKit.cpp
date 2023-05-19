@@ -8,7 +8,8 @@
 #include "Menu/Menu.h"
 #include "Window/Render.h"
 
-DWORD WINAPI RetrievalThread(LPVOID lpParameter) {
+DWORD WINAPI RetrievalThread(LPVOID lpParameter)
+{
     while (true) {
         GetImportsFromIAT();
         GetThreadInformation();
@@ -17,8 +18,23 @@ DWORD WINAPI RetrievalThread(LPVOID lpParameter) {
 }
 
 /* Unstable. */
-DWORD WINAPI InstrumentationThread(LPVOID lpParameter) {
+DWORD WINAPI InstrumentationThread(LPVOID lpParameter)
+{
     return Instrumentation::Initialize();
+}
+
+void InitializeReverseKit()
+{
+    /* Create threads here instead of directly in DllMain.
+     * If a new thread created by CreateThread attempts to access a resource
+     * that has not yet been initialized by DllMain,
+     * it may cause a race condition or deadlock.
+     * Similarly, if a thread created by CreateThread attempts to access a resource
+     * that is being unloaded by DllMain, it may cause a crash or other unpredictable behavior.
+     */
+    CreateThread(nullptr, 0, RetrievalThread, nullptr, 0, nullptr);
+    CreateThread(nullptr, 0, RenderThread, nullptr, 0, nullptr);
+    CreateThread(nullptr, 0, InstrumentationThread, nullptr, 0, nullptr); // Unstable, May crash.
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
@@ -27,14 +43,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     {
     case DLL_PROCESS_ATTACH:
         SetConsoleTitleA("ReverseKit Attached");
-        HookSyscalls();
-        CreateThread(nullptr, 0, RetrievalThread, nullptr, 0, nullptr);
-        CreateThread(nullptr, 0, RenderThread, nullptr, 0, nullptr);
-        CreateThread(nullptr, 0, InstrumentationThread, nullptr, 0, nullptr); // Unstable, May crash.
+        SetHooks::HookSyscalls();
+        InitializeReverseKit();
         break;
     case DLL_PROCESS_DETACH:
-        UnhookSyscalls();
+        SetHooks::UnhookSyscalls();
         break;
+	default: 
+        return TRUE;
     }
 
     return TRUE;
